@@ -56,10 +56,47 @@
             font-size: 12px;
             color: #666;
         }
+        .inset-map {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 200px;
+            height: 200px;
+            z-index: 1;
+            background: transparent;
+            overflow: hidden;
+        }
+        .inset-map .maplibregl-map {
+            background: transparent;
+        }
+        .california-label {
+            position: absolute;
+            top: 40%;
+            left: 45%;
+            transform: translate(-50%, -50%);
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            font-weight: normal;
+            color: #A7AFB6;
+            text-shadow: 
+                -2px -2px 0 #ffffff,
+                2px -2px 0 #ffffff,
+                -2px 2px 0 #ffffff,
+                2px 2px 0 #ffffff,
+                0 -2px 0 #ffffff,
+                0 2px 0 #ffffff,
+                -2px 0 0 #ffffff,
+                2px 0 0 #ffffff;
+            pointer-events: none;
+            z-index: 10;
+        }
     </style>
 </head>
 <body>
 <div id="map"></div>
+<div id="inset-map" class="inset-map">
+    <div class="california-label">CALIFORNIA</div>
+</div>
 <div class="legend">
     <h3>Pack Fire</h3>
     <div class="legend-item">
@@ -169,6 +206,98 @@
     map.addControl(new maplibregl.NavigationControl({
         showCompass: false
     }), 'bottom-right');
+    const insetMap = new maplibregl.Map({
+        container: 'inset-map',
+        style: {
+            version: 8,
+            sources: {},
+            layers: [{
+                id: 'background',
+                type: 'background',
+                paint: {
+                    'background-color': 'transparent'
+                }
+            }]
+        },
+        interactive: false,
+        attributionControl: false
+    });
+    insetMap.on('load', () => {
+        fetch('california_state.geojson')
+        .then(response => response.json())
+        .then(data => {
+            insetMap.addSource('california-state', {
+                type: 'geojson',
+                data: data
+            });
+            insetMap.addLayer({
+                id: 'california-state-fill',
+                type: 'fill',
+                source: 'california-state',
+                paint: {
+                    'fill-color': '#ffffff',
+                    'fill-opacity': 1
+                }
+            });
+            insetMap.addLayer({
+                id: 'california-state-outline',
+                type: 'line',
+                source: 'california-state',
+                paint: {
+                    'line-color': '#A7AFB6',
+                    'line-width': 1
+                }
+            });
+            const bounds = new maplibregl.LngLatBounds();
+            if (data.features && data.features.length > 0) {
+                data.features.forEach(feature => {
+                    if (feature.geometry && feature.geometry.coordinates) {
+                        const coords = feature.geometry.type === 'Polygon' 
+                            ? feature.geometry.coordinates[0]
+                            : feature.geometry.type === 'MultiPolygon'
+                            ? feature.geometry.coordinates.flat()
+                            : feature.geometry.coordinates;
+                        if (Array.isArray(coords[0])) {
+                            coords.forEach(coord => {
+                                if (Array.isArray(coord[0])) {
+                                    coord.forEach(c => bounds.extend(c));
+                                } else {
+                                    bounds.extend(coord);
+                                }
+                            });
+                        } else {
+                            bounds.extend(coords);
+                        }
+                    }
+                });
+                insetMap.fitBounds(bounds, { padding: 40 });
+            }
+            insetMap.addSource('pack-fire-location', {
+                type: 'geojson',
+                data: {
+                    type: 'Feature',
+                    geometry: {
+                        type: 'Point',
+                        coordinates: [-118.7523402087362, 37.563]
+                    }
+                }
+            });
+            insetMap.addLayer({
+                id: 'pack-fire-location',
+                type: 'circle',
+                source: 'pack-fire-location',
+                paint: {
+                    'circle-radius': 4,
+                    'circle-color': '#d37020',
+                    'circle-stroke-color': '#fff',
+                    'circle-stroke-width': 2
+                }
+            });
+        })
+        .catch(error => {
+            console.error('Error loading California state GeoJSON:', error);
+        });
+    });
 </script>
 </body>
 </html>
