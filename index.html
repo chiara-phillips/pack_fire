@@ -63,19 +63,19 @@
 <div class="legend">
     <h3>Pack Fire</h3>
     <div class="legend-item">
-        <div class="legend-color" style="background-color: #ff0000;"></div>
-        <span><b>Evacuation Order:</b> An immediate threat to life. This is an order by law enforcement to leave immediately. The area is lawfully closed to public access.</span>
+        <div class="legend-color" style="background-color: #e5a375;"></div>
+        <span>Evacuation order</span>
     </div>
     <div class="legend-item">
-        <div class="legend-color" style="background-color: #FFA500;"></div>
-        <span><b>Evacuation Warning:</b> A potential threat to life and/or property. Those who require additional time to evacuate and those with pets and livestock should leave immediately.</span>
+        <div class="legend-color" style="background-color: #f2ebc7;"></div>
+        <span>Evacuation warning</span>
     </div>
     <div class="legend-timestamp">
-        Map by Chiara Phillips. Data as of Sat Nov 15 8:39AM Pacific Time, for more details see https://www.fire.ca.gov/incidents/2025/11/13/pack-fire
+        Map by Chiara Phillips. Data as of Sat Nov 15 8:39AM Pacific Time (CalFire)
     </div>
 </div>
 <script>
-    const source = 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json';
+    const source = 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json';
     const map = new maplibregl.Map({
         container: 'map',
         style: source,
@@ -98,11 +98,11 @@
                     'fill-color': [
                     'match',
                     ['get', 'STATUS'],  
-                    'Evacuation Order', '#ff0000',    // red
-                    'Evacuation Warning', '#FFA500',  // orange
+                    'Evacuation Order', '#e5a375',    // red
+                    'Evacuation Warning', '#f2ebc7',  // orange
                     /* default */ '#999999'
                 ],
-                    'fill-opacity': 0.1
+                    'fill-opacity': 0.8
                 }
             });
             map.addLayer({
@@ -113,8 +113,8 @@
                     'line-color': [
                     'match',
                     ['get', 'STATUS'],
-                    'Evacuation Order', '#ff0000',    // darker red
-                    'Evacuation Warning', '#FFA500',  // dark orange
+                    'Evacuation Order', '#d37020',    // darker red
+                    'Evacuation Warning', '#e7d98b',  // dark orange
                     /* default */ '#999999'
                 ],
                     'line-width': 2
@@ -168,7 +168,7 @@
     );
     map.addControl(new maplibregl.NavigationControl({
         showCompass: false
-    }));
+    }), 'bottom-right');
 </script>
 </body>
 </html>
