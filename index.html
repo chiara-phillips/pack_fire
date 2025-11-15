@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <title>Pack Fire</title>
-    <meta property="og:description" content="Your Guide to the 2026 Solar Eclipse." />
+    <meta property="og:description" content="Pack Fire Evacuation Zones" />
     <meta charset='utf-8'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel='stylesheet' href='https://unpkg.com/maplibre-gl@5.6.2/dist/maplibre-gl.css' />
@@ -15,22 +15,72 @@
     <style>
         body { margin: 0; padding: 0; }
         html, body, #map { height: 100%; }
+        #map {
+            background: #000;
+        }
+        .legend {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            z-index: 1;
+        }
+        .legend h3 {
+            margin: 0 0 10px 0;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .legend-item:last-child {
+            margin-bottom: 0;
+        }
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            border-radius: 3px;
+        }
+        .legend-timestamp {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #ddd;
+            font-size: 12px;
+            color: #666;
+        }
     </style>
 </head>
-<style>
-    #map {
-        background: #000;
-    }
-</style>
 <body>
 <div id="map"></div>
+<div class="legend">
+    <h3>Pack Fire</h3>
+    <div class="legend-item">
+        <div class="legend-color" style="background-color: #ff0000;"></div>
+        <span><b>Evacuation Order:</b> An immediate threat to life. This is an order by law enforcement to leave immediately. The area is lawfully closed to public access.</span>
+    </div>
+    <div class="legend-item">
+        <div class="legend-color" style="background-color: #FFA500;"></div>
+        <span><b>Evacuation Warning:</b> A potential threat to life and/or property. Those who require additional time to evacuate and those with pets and livestock should leave immediately.</span>
+    </div>
+    <div class="legend-timestamp">
+        Map by Chiara Phillips. Data as of Sat Nov 15 8:39AM Pacific Time, for more details see https://www.fire.ca.gov/incidents/2025/11/13/pack-fire
+    </div>
+</div>
 <script>
     const source = 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json';
     const map = new maplibregl.Map({
         container: 'map',
         style: source,
         zoom: 10,
-        center: [-118.7523402087362, 37.60485913533001],
+        center: [-118.7523402087362, 37.563],
     });
     map.on('load', () => {
         fetch('https://services.arcgis.com/BLN4oKB0N1YSgvY8/arcgis/rest/services/CA_EVACUATIONS_CalOESHosted_view/FeatureServer/0/query?where=1%3D1&outFields=*&f=geojson')
@@ -47,7 +97,7 @@
                 paint: {
                     'fill-color': [
                     'match',
-                    ['get', 'STATUS'],     // <-- field name from your data
+                    ['get', 'STATUS'],  
                     'Evacuation Order', '#ff0000',    // red
                     'Evacuation Warning', '#FFA500',  // orange
                     /* default */ '#999999'
@@ -62,7 +112,7 @@
                 paint: {
                     'line-color': [
                     'match',
-                    ['get', 'STATUS'],     // <-- field name from your data
+                    ['get', 'STATUS'],
                     'Evacuation Order', '#ff0000',    // darker red
                     'Evacuation Warning', '#FFA500',  // dark orange
                     /* default */ '#999999'
